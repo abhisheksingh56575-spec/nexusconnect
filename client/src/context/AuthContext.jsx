@@ -34,21 +34,40 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
-    const { data } = await API.post('/auth/login', { email, password });
-    localStorage.setItem('nexus_token', data.token);
-    localStorage.setItem('nexus_user', JSON.stringify(data));
-    setToken(data.token);
-    setUser(data);
-    return data;
+    try {
+      const { data } = await API.post('/auth/login', { email, password });
+      localStorage.setItem('nexus_token', data.token);
+      localStorage.setItem('nexus_user', JSON.stringify(data));
+      setToken(data.token);
+      setUser(data);
+      return data;
+    } catch (err) {
+      if (err.response) {
+        throw err;
+      }
+      // Network error — backend is unreachable
+      const networkError = new Error('Unable to connect to the server. Please try again later.');
+      networkError.response = { data: { message: 'Unable to connect to the server. Please check your connection and try again.' } };
+      throw networkError;
+    }
   };
 
   const register = async (userData) => {
-    const { data } = await API.post('/auth/register', userData);
-    localStorage.setItem('nexus_token', data.token);
-    localStorage.setItem('nexus_user', JSON.stringify(data));
-    setToken(data.token);
-    setUser(data);
-    return data;
+    try {
+      const { data } = await API.post('/auth/register', userData);
+      localStorage.setItem('nexus_token', data.token);
+      localStorage.setItem('nexus_user', JSON.stringify(data));
+      setToken(data.token);
+      setUser(data);
+      return data;
+    } catch (err) {
+      if (err.response) {
+        throw err;
+      }
+      const networkError = new Error('Unable to connect to the server. Please try again later.');
+      networkError.response = { data: { message: 'Unable to connect to the server. Please check your connection and try again.' } };
+      throw networkError;
+    }
   };
 
   const logout = () => {
